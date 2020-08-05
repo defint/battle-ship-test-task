@@ -3,12 +3,11 @@ import {
   BattlegroundState,
   CellStatus,
   Ship,
-  ShipModel,
   ShipRotation,
   ShipType,
 } from './types';
 import { createShip, getShipScheme } from './ship';
-import { AREA_SIZE } from './constants';
+import { AREA_SIZE, shipModelsList } from './constants';
 
 export const getKeyByCoord = (x: number, y: number): string => `${x}:${y}`;
 
@@ -72,13 +71,7 @@ export const getInitialState = (): AppState => {
   let battleground = getInitialBattlegroundState();
   const ships: Ship[] = [];
 
-  const shipModels = [
-    ShipModel.CURVED,
-    ShipModel.LINE,
-    ShipModel.SINGLE,
-    ShipModel.SINGLE,
-  ];
-  shipModels.forEach((model) => {
+  shipModelsList.forEach((model) => {
     const type = {
       model,
       reverse: getRandomArrayItem<boolean>([true, false]),
