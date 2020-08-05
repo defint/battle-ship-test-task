@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import { AREA_SIZE, SIMULATION_DELAY_MS } from '../utils/constants';
-import Cell, { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
+import { SIMULATION_DELAY_MS } from '../utils/constants';
+import Cell from './Cell';
 import { AppState } from '../utils/types';
 import { getInitialState } from '../utils/battleground';
 import { makeShot } from '../utils/shot';
 import { useInterval } from '../utils/useInterval';
+import { CellsWrapper } from './CellsWrapper';
+import styled from 'styled-components';
 
-const Wrapper = styled.div`
+const AppContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: ${CELL_SIZE * AREA_SIZE}px;
-  border-top: 1px solid ${CELL_BORDER_COLOR};
-  border-left: 1px solid ${CELL_BORDER_COLOR};
+  justify-content: center;
+  align-items: center;
+`;
+
+const Button = styled.button`
+  width: 200px;
+  height: 38px;
+  display: inline-block;
+  margin-top: 14px;
 `;
 
 function App(): JSX.Element {
@@ -24,9 +27,7 @@ function App(): JSX.Element {
   const [state, setState] = useState<AppState>(getInitialState());
 
   useInterval(
-    () => {
-      setState((old) => makeShot(old));
-    },
+    () => setState(makeShot),
     isRunning && !state.isGameOver ? SIMULATION_DELAY_MS : null,
   );
 
@@ -37,33 +38,39 @@ function App(): JSX.Element {
   }
 
   return (
-    <div>
-      <Wrapper>{cells}</Wrapper>
-      {!state.isGameOver && (
-        <button
-          onClick={(): void => {
-            setState((old) => makeShot(old));
-          }}
-        >
-          SHOT
-        </button>
-      )}
-      <button
-        onClick={(): void => {
-          setState(getInitialState());
-        }}
-      >
-        RESTART
-      </button>
-
-      <button
-        onClick={(): void => {
-          setIsRunning((old) => !old);
-        }}
-      >
-        RUN SIM
-      </button>
-    </div>
+    <AppContainer>
+      <div>
+        <div>
+          <Button
+            onClick={(): void => {
+              setState(makeShot);
+            }}
+            disabled={state.isGameOver}
+          >
+            {state.isGameOver ? 'Game is over' : 'Make random shot'}
+          </Button>
+        </div>
+        <div>
+          <Button
+            onClick={(): void => {
+              setState(getInitialState());
+            }}
+          >
+            Restart game
+          </Button>
+        </div>
+        <div>
+          <Button
+            onClick={(): void => {
+              setIsRunning((old) => !old);
+            }}
+          >
+            {isRunning ? 'Stop simulation' : 'Run simulation'}
+          </Button>
+        </div>
+      </div>
+      <CellsWrapper>{cells}</CellsWrapper>
+    </AppContainer>
   );
 }
 
