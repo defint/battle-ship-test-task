@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { CellStatus } from '../utils/constants';
+import { CellStatus } from '../utils/types';
 
 export const CELL_BORDER_COLOR = '#434343';
 export const CELL_SIZE = 60;

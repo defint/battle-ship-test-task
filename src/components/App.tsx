@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { AREA_SIZE, CellStatus, ShipType } from '../utils/constants';
+import { AREA_SIZE } from '../utils/constants';
 import Cell, { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
-import { AppState, BattlegroundState, Ship } from '../utils/types';
+import {
+  AppState,
+  BattlegroundState,
+  CellStatus,
+  Ship,
+  ShipModel,
+  ShipRotation,
+  ShipType,
+} from '../utils/types';
+import { getCoordByKey, getKeyByCoord } from '../utils/battleground';
+import { getShipScheme } from '../utils/ship';
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,12 +38,30 @@ const getInitialBattlegroundState = (): BattlegroundState => {
 
   for (let i = 0; i < AREA_SIZE; i++) {
     for (let j = 0; j < AREA_SIZE; j++) {
-      const key = `${i}:${j}`;
-      battleground[key] = CellStatus.EMPTY;
+      battleground[getKeyByCoord(i, j)] = CellStatus.EMPTY;
     }
   }
 
   return battleground;
+};
+
+const checkAvailableShipPosition = (
+  battlegroundState: BattlegroundState,
+  shipType: ShipType,
+): string[][] => {
+  const result = [];
+  const currentScheme = getShipScheme(shipType);
+  for (const [key] of Object.entries(battlegroundState)) {
+    const [x, y] = getCoordByKey(key);
+    const allPositions = currentScheme(x, y);
+    const canAdd = allPositions.every(
+      (item) => battlegroundState[item] === CellStatus.EMPTY,
+    );
+    if (canAdd) {
+      result.push(allPositions);
+    }
+  }
+  return result;
 };
 
 const createShip = (): Ship => {
@@ -44,7 +72,7 @@ const createShip = (): Ship => {
   const boundaries: BattlegroundState = {};
 
   for (const [key] of Object.entries(parts)) {
-    const [x, y] = key.split(':').map((item) => parseInt(item, 10));
+    const [x, y] = getCoordByKey(key);
     const xMin = Math.max(0, x - 1);
     const xMax = Math.min(AREA_SIZE, x + 1);
     const yMin = Math.max(0, y - 1);
@@ -52,14 +80,17 @@ const createShip = (): Ship => {
 
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
-        const key = `${i}:${j}`;
-        boundaries[key] = CellStatus.SHIP_BOUNDARY;
+        boundaries[getKeyByCoord(i, j)] = CellStatus.SHIP_BOUNDARY;
       }
     }
   }
 
   return {
-    type: ShipType.SINGLE,
+    type: {
+      model: ShipModel.SINGLE,
+      reverse: false,
+      rotation: ShipRotation.LEFT,
+    },
     parts: {
       ...boundaries,
       ...parts,
@@ -71,6 +102,14 @@ const getInitialState = (): AppState => {
   const initialBattleground = getInitialBattlegroundState();
 
   const ship = createShip();
+
+  console.log(
+    checkAvailableShipPosition(initialBattleground, {
+      model: ShipModel.LINE,
+      reverse: false,
+      rotation: ShipRotation.LEFT,
+    }),
+  );
 
   return {
     battleground: mergeBattlegroundState(initialBattleground, ship.parts),
