@@ -103,6 +103,7 @@ export const createShip = (shipPositions: string[], type: ShipType): Ship => {
       ...boundaries,
       ...parts,
     },
+    isAlive: true,
   };
 };
 
@@ -111,12 +112,13 @@ export const shotShip = (ship: Ship, shotKey: string): Ship => {
 
   if (target) {
     const newParts = { ...ship.parts };
+    let isAlive = ship.isAlive;
 
     switch (target) {
       case CellStatus.SHIP:
         newParts[shotKey] = CellStatus.SHIP_SINK;
 
-        const isAlive = Object.values(newParts).some(
+        isAlive = Object.values(newParts).some(
           (status) => status === CellStatus.SHIP,
         );
 
@@ -140,7 +142,7 @@ export const shotShip = (ship: Ship, shotKey: string): Ship => {
         break;
     }
 
-    return { ...ship, parts: newParts };
+    return { ...ship, parts: newParts, isAlive };
   }
   return ship;
 };

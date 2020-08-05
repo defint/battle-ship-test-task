@@ -47,7 +47,11 @@ function Cell({ cellState }: { cellState: CellStatus }): JSX.Element {
       {[CellStatus.MISSED, CellStatus.SHIP_SINK].includes(cellState) && (
         <span>•</span>
       )}
-      {[CellStatus.SHIP_DEAD].includes(cellState) && <span>💀</span>}
+      {[CellStatus.SHIP_DEAD].includes(cellState) && (
+        <span role="img" aria-label="dead">
+          💀
+        </span>
+      )}
     </CellContainer>
   );
 }

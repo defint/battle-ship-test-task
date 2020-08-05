@@ -31,6 +31,7 @@ export interface ShipType {
 export interface Ship {
   type: ShipType;
   parts: BattlegroundState;
+  isAlive: boolean;
 }
 
 export interface AppState {

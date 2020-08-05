@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { AREA_SIZE } from '../utils/constants';
+import { AREA_SIZE, SIMULATION_DELAY_MS } from '../utils/constants';
 import Cell, { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
 import { AppState } from '../utils/types';
 import { getInitialState } from '../utils/battleground';
 import { makeShot } from '../utils/shot';
+import { useInterval } from '../utils/useInterval';
 
 const Wrapper = styled.div`
   display: flex;
@@ -18,7 +19,16 @@ const Wrapper = styled.div`
 `;
 
 function App(): JSX.Element {
+  const [isRunning, setIsRunning] = useState(false);
+
   const [state, setState] = useState<AppState>(getInitialState());
+
+  useInterval(
+    () => {
+      setState((old) => makeShot(old));
+    },
+    isRunning && !state.isGameOver ? SIMULATION_DELAY_MS : null,
+  );
 
   const cells: JSX.Element[] = [];
 
@@ -44,6 +54,14 @@ function App(): JSX.Element {
         }}
       >
         RESTART
+      </button>
+
+      <button
+        onClick={(): void => {
+          setIsRunning((old) => !old);
+        }}
+      >
+        RUN SIM
       </button>
     </div>
   );

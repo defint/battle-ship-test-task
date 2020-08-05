@@ -32,13 +32,15 @@ export const makeShot = (appState: AppState): AppState => {
     shotShip(ship, availableKey),
   );
 
+  let isGameOver = true;
   recalculatedShips.forEach((ship) => {
     battleground = mergeBattlegroundState(battleground, ship.parts);
+    isGameOver = isGameOver && !ship.isAlive;
   });
 
   return {
     ships: recalculatedShips,
     battleground,
-    isGameOver: false,
+    isGameOver,
   };
 };
