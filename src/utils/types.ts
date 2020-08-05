@@ -6,6 +6,7 @@ export enum CellStatus {
   SHIP,
   SHIP_BOUNDARY,
   SHIP_SINK,
+  SHIP_DEAD,
 }
 
 export enum ShipModel {

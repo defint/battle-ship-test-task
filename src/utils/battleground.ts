@@ -23,10 +23,19 @@ export const getRandomArrayItem = <T>(arr: Array<T>): T => {
 export const mergeBattlegroundState = (
   battlegroundState: BattlegroundState,
   partialStateForUpdate: BattlegroundState,
-): BattlegroundState => ({
-  ...battlegroundState,
-  ...partialStateForUpdate,
-});
+): BattlegroundState => {
+  const result = { ...battlegroundState };
+
+  for (const [key, value] of Object.entries(partialStateForUpdate)) {
+    const oldValue = result[key];
+    if (oldValue === CellStatus.MISSED && value === CellStatus.SHIP_BOUNDARY) {
+      result[key] = CellStatus.MISSED;
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+};
 
 const getInitialBattlegroundState = (): BattlegroundState => {
   const battleground: { [key: string]: CellStatus } = {};

@@ -105,3 +105,42 @@ export const createShip = (shipPositions: string[], type: ShipType): Ship => {
     },
   };
 };
+
+export const shotShip = (ship: Ship, shotKey: string): Ship => {
+  const target = ship.parts[shotKey];
+
+  if (target) {
+    const newParts = { ...ship.parts };
+
+    switch (target) {
+      case CellStatus.SHIP:
+        newParts[shotKey] = CellStatus.SHIP_SINK;
+
+        const isAlive = Object.values(newParts).some(
+          (status) => status === CellStatus.SHIP,
+        );
+
+        if (!isAlive) {
+          for (const [key, value] of Object.entries(newParts)) {
+            if (value === CellStatus.SHIP_SINK) {
+              newParts[key] = CellStatus.SHIP_DEAD;
+            }
+
+            if (value === CellStatus.SHIP_BOUNDARY) {
+              newParts[key] = CellStatus.MISSED;
+            }
+          }
+        }
+
+        break;
+      case CellStatus.SHIP_BOUNDARY:
+        newParts[shotKey] = CellStatus.MISSED;
+        break;
+      default:
+        break;
+    }
+
+    return { ...ship, parts: newParts };
+  }
+  return ship;
+};

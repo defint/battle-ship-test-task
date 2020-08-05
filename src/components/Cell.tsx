@@ -17,6 +17,10 @@ const getCellColor = (cellState: CellStatus): string => {
       return '#6b99e9';
     case CellStatus.SHIP_BOUNDARY:
       return '#e7ebf6';
+    case CellStatus.SHIP_DEAD:
+      return '#b32626';
+    case CellStatus.SHIP_SINK:
+      return '#f3b81e';
     case CellStatus.EMPTY:
     default:
       return '#ffffff';

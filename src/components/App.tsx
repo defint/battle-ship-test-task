@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { AREA_SIZE } from '../utils/constants';
 import Cell, { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
-import { AppState, BattlegroundState, CellStatus } from '../utils/types';
+import { AppState, BattlegroundState, CellStatus, Ship } from '../utils/types';
 import {
   getInitialState,
   getRandomArrayItem,
   mergeBattlegroundState,
 } from '../utils/battleground';
+import { shotShip } from '../utils/ship';
 
 const Wrapper = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const isAvailableForShot = (cellStatus: CellStatus): boolean =>
 
 const getRandomAvailableKey = (
   battlegroundState: BattlegroundState,
-): [string, number] => {
+): string => {
   const availablePositions = [];
 
   for (const [key, value] of Object.entries(battlegroundState)) {
@@ -36,23 +37,28 @@ const getRandomAvailableKey = (
     }
   }
 
-  return [
-    getRandomArrayItem<string>(availablePositions),
-    availablePositions.length - 1,
-  ];
+  return getRandomArrayItem<string>(availablePositions);
 };
 
 const makeShot = (appState: AppState): AppState => {
-  const [availableKey, leftShots] = getRandomAvailableKey(
-    appState.battleground,
+  const availableKey = getRandomAvailableKey(appState.battleground);
+
+  let battleground = mergeBattlegroundState(appState.battleground, {
+    [availableKey]: CellStatus.MISSED,
+  });
+
+  const recalculatedShips: Ship[] = appState.ships.map((ship) =>
+    shotShip(ship, availableKey),
   );
 
+  recalculatedShips.forEach((ship) => {
+    battleground = mergeBattlegroundState(battleground, ship.parts);
+  });
+
   return {
-    ...appState,
-    battleground: mergeBattlegroundState(appState.battleground, {
-      [availableKey]: CellStatus.MISSED,
-    }),
-    isGameOver: leftShots === 0,
+    ships: recalculatedShips,
+    battleground,
+    isGameOver: false,
   };
 };
 
