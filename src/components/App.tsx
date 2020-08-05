@@ -47,7 +47,7 @@ const isAvailableForShot = (cellStatus: CellStatus): boolean =>
 
 const getRandomAvailableKey = (
   battlegroundState: BattlegroundState,
-): string => {
+): [string, number] => {
   const availablePositions = [];
 
   for (const [key, value] of Object.entries(battlegroundState)) {
@@ -57,21 +57,23 @@ const getRandomAvailableKey = (
   }
 
   const randomPos = Math.floor(Math.random() * availablePositions.length);
-  return availablePositions[randomPos];
+  return [availablePositions[randomPos], availablePositions.length - 1];
 };
 
 const makeShot = (appState: AppState): AppState => {
-  const availableKey = getRandomAvailableKey(appState.battleground);
+  const [availableKey, leftShots] = getRandomAvailableKey(
+    appState.battleground,
+  );
 
   return {
     battleground: mergeBattlegroundState(appState.battleground, {
       [availableKey]: CellStatus.MISSED,
     }),
-    isGameOver: false,
+    isGameOver: leftShots === 0,
   };
 };
 
-function App() {
+function App(): JSX.Element {
   const [state, setState] = useState<AppState>({
     battleground: getInitialBattlegroundState(),
     isGameOver: false,
