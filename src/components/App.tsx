@@ -3,7 +3,7 @@ import { SIMULATION_DELAY_MS } from '../utils/constants';
 import Cell from './Cell';
 import { AppState } from '../utils/types';
 import { getInitialState } from '../utils/battleground';
-import { makeShot } from '../utils/shot';
+import { makeRandomShot, makeShot } from '../utils/shot';
 import { useInterval } from '../utils/useInterval';
 import { CellsWrapper } from './CellsWrapper';
 import styled from 'styled-components';
@@ -27,14 +27,20 @@ function App(): JSX.Element {
   const [state, setState] = useState<AppState>(getInitialState());
 
   useInterval(
-    () => setState(makeShot),
+    () => setState(makeRandomShot),
     isRunning && !state.isGameOver ? SIMULATION_DELAY_MS : null,
   );
 
   const cells: JSX.Element[] = [];
 
   for (const [key, value] of Object.entries(state.battleground)) {
-    cells.push(<Cell key={key} cellState={value} />);
+    cells.push(
+      <Cell
+        key={key}
+        cellState={value}
+        onClick={(): void => setState((old) => makeShot(old, key))}
+      />,
+    );
   }
 
   return (
@@ -43,7 +49,7 @@ function App(): JSX.Element {
         <div>
           <Button
             onClick={(): void => {
-              setState(makeShot);
+              setState(makeRandomShot);
             }}
             disabled={state.isGameOver}
           >

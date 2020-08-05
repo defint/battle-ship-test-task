@@ -2,9 +2,15 @@ import React from 'react';
 import { CellStatus } from '../utils/types';
 import { CellContainer } from './CellContainer';
 
-function Cell({ cellState }: { cellState: CellStatus }): JSX.Element {
+function Cell({
+  cellState,
+  onClick,
+}: {
+  cellState: CellStatus;
+  onClick: Function;
+}): JSX.Element {
   return (
-    <CellContainer cellState={cellState}>
+    <CellContainer cellState={cellState} onClick={(): void => onClick()}>
       {[CellStatus.MISSED, CellStatus.SHIP_SINK].includes(cellState) && (
         <span>•</span>
       )}

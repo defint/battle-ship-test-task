@@ -21,8 +21,13 @@ const getRandomAvailableKey = (
   return getRandomArrayItem<string>(availablePositions);
 };
 
-export const makeShot = (appState: AppState): AppState => {
-  const availableKey = getRandomAvailableKey(appState.battleground);
+export const makeShot = (
+  appState: AppState,
+  availableKey: string,
+): AppState => {
+  if (!isAvailableForShot(appState.battleground[availableKey])) {
+    return appState;
+  }
 
   let battleground = mergeBattlegroundState(appState.battleground, {
     [availableKey]: CellStatus.MISSED,
@@ -43,4 +48,9 @@ export const makeShot = (appState: AppState): AppState => {
     battleground,
     isGameOver,
   };
+};
+
+export const makeRandomShot = (appState: AppState): AppState => {
+  const availableKey = getRandomAvailableKey(appState.battleground);
+  return makeShot(appState, availableKey);
 };
