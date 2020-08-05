@@ -1,5 +1,14 @@
-import { ShipModel, ShipRotation, ShipScheme, ShipType } from './types';
-import { getKeyByCoord } from './battleground';
+import {
+  BattlegroundState,
+  CellStatus,
+  Ship,
+  ShipModel,
+  ShipRotation,
+  ShipScheme,
+  ShipType,
+} from './types';
+import { getCoordByKey, getKeyByCoord } from './battleground';
+import { AREA_SIZE } from './constants';
 
 export const getShipScheme = (shipType: ShipType): ShipScheme => {
   const { model, rotation, reverse } = shipType;
@@ -63,4 +72,36 @@ export const getShipScheme = (shipType: ShipType): ShipScheme => {
     default:
       return (x, y): string[] => [`${x}:${y}`];
   }
+};
+
+export const createShip = (shipPositions: string[], type: ShipType): Ship => {
+  const parts: BattlegroundState = {};
+
+  shipPositions.forEach((item) => {
+    parts[item] = CellStatus.SHIP;
+  });
+
+  const boundaries: BattlegroundState = {};
+
+  for (const [key] of Object.entries(parts)) {
+    const [x, y] = getCoordByKey(key);
+    const xMin = Math.max(0, x - 1);
+    const xMax = Math.min(AREA_SIZE - 1, x + 1);
+    const yMin = Math.max(0, y - 1);
+    const yMax = Math.min(AREA_SIZE - 1, y + 1);
+
+    for (let i = xMin; i <= xMax; i++) {
+      for (let j = yMin; j <= yMax; j++) {
+        boundaries[getKeyByCoord(i, j)] = CellStatus.SHIP_BOUNDARY;
+      }
+    }
+  }
+
+  return {
+    type,
+    parts: {
+      ...boundaries,
+      ...parts,
+    },
+  };
 };
