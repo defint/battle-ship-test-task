@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { AREA_SIZE, CellStatus } from '../constants';
+import { AREA_SIZE, CellStatus, ShipType } from '../utils/constants';
 import Cell, { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
+import { AppState, BattlegroundState, Ship } from '../utils/types';
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,29 +14,6 @@ const Wrapper = styled.div`
   border-top: 1px solid ${CELL_BORDER_COLOR};
   border-left: 1px solid ${CELL_BORDER_COLOR};
 `;
-
-type BattlegroundState = { [key: string]: CellStatus };
-
-enum ShipType {
-  SINGLE,
-  LINE_HORIZONTAL,
-  LINE_VERTICAL,
-  CURVED_LEFT,
-  CURVED_RIGHT,
-  CURVED_TOP,
-  CURVED_BOTTOM,
-}
-
-interface Ship {
-  type: ShipType;
-  parts: BattlegroundState;
-}
-
-interface AppState {
-  battleground: BattlegroundState;
-  isGameOver: boolean;
-  ships: Ship[];
-}
 
 const mergeBattlegroundState = (
   battlegroundState: BattlegroundState,
