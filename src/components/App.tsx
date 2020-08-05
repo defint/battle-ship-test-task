@@ -11,7 +11,11 @@ import {
   ShipRotation,
   ShipType,
 } from '../utils/types';
-import { getCoordByKey, getKeyByCoord } from '../utils/battleground';
+import {
+  getCoordByKey,
+  getKeyByCoord,
+  getRandomArrayItem,
+} from '../utils/battleground';
 import { getShipScheme } from '../utils/ship';
 
 const Wrapper = styled.div`
@@ -64,19 +68,21 @@ const checkAvailableShipPosition = (
   return result;
 };
 
-const createShip = (): Ship => {
-  const parts = {
-    '0:1': CellStatus.SHIP,
-  };
+const createShip = (shipPositions: string[], type: ShipType): Ship => {
+  const parts: BattlegroundState = {};
+
+  shipPositions.forEach((item) => {
+    parts[item] = CellStatus.SHIP;
+  });
 
   const boundaries: BattlegroundState = {};
 
   for (const [key] of Object.entries(parts)) {
     const [x, y] = getCoordByKey(key);
     const xMin = Math.max(0, x - 1);
-    const xMax = Math.min(AREA_SIZE, x + 1);
+    const xMax = Math.min(AREA_SIZE - 1, x + 1);
     const yMin = Math.max(0, y - 1);
-    const yMax = Math.min(AREA_SIZE, y + 1);
+    const yMax = Math.min(AREA_SIZE - 1, y + 1);
 
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
@@ -86,11 +92,7 @@ const createShip = (): Ship => {
   }
 
   return {
-    type: {
-      model: ShipModel.SINGLE,
-      reverse: false,
-      rotation: ShipRotation.LEFT,
-    },
+    type,
     parts: {
       ...boundaries,
       ...parts,
@@ -99,22 +101,37 @@ const createShip = (): Ship => {
 };
 
 const getInitialState = (): AppState => {
-  const initialBattleground = getInitialBattlegroundState();
+  let battleground = getInitialBattlegroundState();
+  const ships: Ship[] = [];
 
-  const ship = createShip();
-
-  console.log(
-    checkAvailableShipPosition(initialBattleground, {
-      model: ShipModel.LINE,
-      reverse: false,
-      rotation: ShipRotation.LEFT,
-    }),
-  );
+  const shipModels = [
+    ShipModel.CURVED,
+    ShipModel.LINE,
+    ShipModel.SINGLE,
+    ShipModel.SINGLE,
+  ];
+  shipModels.forEach((model) => {
+    const type = {
+      model,
+      reverse: getRandomArrayItem<boolean>([true, false]),
+      rotation: getRandomArrayItem<ShipRotation>([
+        ShipRotation.LEFT,
+        ShipRotation.BOTTOM,
+        ShipRotation.RIGHT,
+        ShipRotation.TOP,
+      ]),
+    };
+    const allPositions = checkAvailableShipPosition(battleground, type);
+    const randomPosition: string[] = getRandomArrayItem<string[]>(allPositions);
+    const ship = createShip(randomPosition, type);
+    ships.push(ship);
+    battleground = mergeBattlegroundState(battleground, ship.parts);
+  });
 
   return {
-    battleground: mergeBattlegroundState(initialBattleground, ship.parts),
+    battleground,
     isGameOver: false,
-    ships: [ship],
+    ships,
   };
 };
 
@@ -134,8 +151,10 @@ const getRandomAvailableKey = (
     }
   }
 
-  const randomPos = Math.floor(Math.random() * availablePositions.length);
-  return [availablePositions[randomPos], availablePositions.length - 1];
+  return [
+    getRandomArrayItem<string>(availablePositions),
+    availablePositions.length - 1,
+  ];
 };
 
 const makeShot = (appState: AppState): AppState => {

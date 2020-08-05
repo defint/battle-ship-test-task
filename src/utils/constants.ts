@@ -1,1 +1,1 @@
-export const AREA_SIZE = 5;
+export const AREA_SIZE = 10;

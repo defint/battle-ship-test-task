@@ -32,7 +32,7 @@ export const getShipScheme = (shipType: ShipType): ShipScheme => {
           return (x, y): string[] => {
             const head = getKeyByCoord(
               reverse ? x + 1 : x - 1,
-              rotation === ShipRotation.BOTTOM ? y + 3 : y,
+              rotation === ShipRotation.BOTTOM ? y + 2 : y,
             );
 
             return [
@@ -47,7 +47,7 @@ export const getShipScheme = (shipType: ShipType): ShipScheme => {
         case ShipRotation.RIGHT:
           return (x, y): string[] => {
             const head = getKeyByCoord(
-              rotation === ShipRotation.LEFT ? x : x + 3,
+              rotation === ShipRotation.LEFT ? x : x + 2,
               reverse ? y + 1 : y - 1,
             );
 
