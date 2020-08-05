@@ -1,8 +1,9 @@
-export const AREA_SIZE = 3;
+export const AREA_SIZE = 5;
 
 export enum CellStatus {
   EMPTY,
   MISSED,
   SHIP,
-  SINK_SHIP,
+  SHIP_BOUNDARY,
+  SHIP_SINK,
 }

@@ -13,6 +13,10 @@ const getCellColor = (cellState: CellStatus): string => {
   switch (cellState) {
     case CellStatus.MISSED:
       return '#9F9F9F';
+    case CellStatus.SHIP:
+      return '#6b99e9';
+    case CellStatus.SHIP_BOUNDARY:
+      return '#e7ebf6';
     case CellStatus.EMPTY:
     default:
       return '#ffffff';

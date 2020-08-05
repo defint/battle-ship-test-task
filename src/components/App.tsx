@@ -16,10 +16,34 @@ const Wrapper = styled.div`
 
 type BattlegroundState = { [key: string]: CellStatus };
 
+enum ShipType {
+  SINGLE,
+  LINE_HORIZONTAL,
+  LINE_VERTICAL,
+  CURVED_LEFT,
+  CURVED_RIGHT,
+  CURVED_TOP,
+  CURVED_BOTTOM,
+}
+
+interface Ship {
+  type: ShipType;
+  parts: BattlegroundState;
+}
+
 interface AppState {
   battleground: BattlegroundState;
   isGameOver: boolean;
+  ships: Ship[];
 }
+
+const mergeBattlegroundState = (
+  battlegroundState: BattlegroundState,
+  partialStateForUpdate: BattlegroundState,
+): BattlegroundState => ({
+  ...battlegroundState,
+  ...partialStateForUpdate,
+});
 
 const getInitialBattlegroundState = (): BattlegroundState => {
   const battleground: { [key: string]: CellStatus } = {};
@@ -34,16 +58,53 @@ const getInitialBattlegroundState = (): BattlegroundState => {
   return battleground;
 };
 
-const mergeBattlegroundState = (
-  battlegroundState: BattlegroundState,
-  partialStateForUpdate: BattlegroundState,
-): BattlegroundState => ({
-  ...battlegroundState,
-  ...partialStateForUpdate,
-});
+const createShip = (): Ship => {
+  const parts = {
+    '0:1': CellStatus.SHIP,
+  };
+
+  const boundaries: BattlegroundState = {};
+
+  for (const [key] of Object.entries(parts)) {
+    const [x, y] = key.split(':').map((item) => parseInt(item, 10));
+    const xMin = Math.max(0, x - 1);
+    const xMax = Math.min(AREA_SIZE, x + 1);
+    const yMin = Math.max(0, y - 1);
+    const yMax = Math.min(AREA_SIZE, y + 1);
+
+    for (let i = xMin; i <= xMax; i++) {
+      for (let j = yMin; j <= yMax; j++) {
+        const key = `${i}:${j}`;
+        boundaries[key] = CellStatus.SHIP_BOUNDARY;
+      }
+    }
+  }
+
+  return {
+    type: ShipType.SINGLE,
+    parts: {
+      ...boundaries,
+      ...parts,
+    },
+  };
+};
+
+const getInitialState = (): AppState => {
+  const initialBattleground = getInitialBattlegroundState();
+
+  const ship = createShip();
+
+  return {
+    battleground: mergeBattlegroundState(initialBattleground, ship.parts),
+    isGameOver: false,
+    ships: [ship],
+  };
+};
 
 const isAvailableForShot = (cellStatus: CellStatus): boolean =>
-  [CellStatus.EMPTY, CellStatus.SHIP].some((item) => item === cellStatus);
+  [CellStatus.EMPTY, CellStatus.SHIP, CellStatus.SHIP_BOUNDARY].some(
+    (item) => item === cellStatus,
+  );
 
 const getRandomAvailableKey = (
   battlegroundState: BattlegroundState,
@@ -66,6 +127,7 @@ const makeShot = (appState: AppState): AppState => {
   );
 
   return {
+    ...appState,
     battleground: mergeBattlegroundState(appState.battleground, {
       [availableKey]: CellStatus.MISSED,
     }),
@@ -74,10 +136,7 @@ const makeShot = (appState: AppState): AppState => {
 };
 
 function App(): JSX.Element {
-  const [state, setState] = useState<AppState>({
-    battleground: getInitialBattlegroundState(),
-    isGameOver: false,
-  });
+  const [state, setState] = useState<AppState>(getInitialState());
 
   const cells: JSX.Element[] = [];
 
