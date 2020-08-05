@@ -1,4 +1,4 @@
-export const AREA_SIZE = 10;
+export const AREA_SIZE = 3;
 
 export enum CellStatus {
   EMPTY,

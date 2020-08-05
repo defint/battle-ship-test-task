@@ -16,6 +16,11 @@ const Wrapper = styled.div`
 
 type BattlegroundState = { [key: string]: CellStatus };
 
+interface AppState {
+  battleground: BattlegroundState;
+  isGameOver: boolean;
+}
+
 const getInitialBattlegroundState = (): BattlegroundState => {
   const battleground: { [key: string]: CellStatus } = {};
 
@@ -55,35 +60,41 @@ const getRandomAvailableKey = (
   return availablePositions[randomPos];
 };
 
-const makeShot = (battlegroundState: BattlegroundState): BattlegroundState => {
-  const availableKey = getRandomAvailableKey(battlegroundState);
+const makeShot = (appState: AppState): AppState => {
+  const availableKey = getRandomAvailableKey(appState.battleground);
 
-  return mergeBattlegroundState(battlegroundState, {
-    [availableKey]: CellStatus.MISSED,
-  });
+  return {
+    battleground: mergeBattlegroundState(appState.battleground, {
+      [availableKey]: CellStatus.MISSED,
+    }),
+    isGameOver: false,
+  };
 };
 
 function App() {
-  const [battlegroundState, setBattlegroundState] = useState(
-    getInitialBattlegroundState(),
-  );
+  const [state, setState] = useState<AppState>({
+    battleground: getInitialBattlegroundState(),
+    isGameOver: false,
+  });
 
   const cells: JSX.Element[] = [];
 
-  for (const [key, value] of Object.entries(battlegroundState)) {
+  for (const [key, value] of Object.entries(state.battleground)) {
     cells.push(<Cell key={key} cellState={value} />);
   }
 
   return (
     <div>
       <Wrapper>{cells}</Wrapper>
-      <button
-        onClick={() => {
-          setBattlegroundState((old) => makeShot(old));
-        }}
-      >
-        SHOT
-      </button>
+      {!state.isGameOver && (
+        <button
+          onClick={() => {
+            setState((old) => makeShot(old));
+          }}
+        >
+          SHOT
+        </button>
+      )}
     </div>
   );
 }
