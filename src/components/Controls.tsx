@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { getInitialState } from '../utils/battleground';
 import { makeRandomShot } from '../utils/shot';
 import styled from 'styled-components';
@@ -6,6 +6,10 @@ import { useAction, useAtom } from '@reatom/react';
 import { useInterval } from '../utils/useInterval';
 import { SIMULATION_DELAY_MS } from '../utils/constants';
 import { appState, changeAppState } from '../state/appState';
+import {
+  changeIsSimulationAction,
+  isSimulationState,
+} from '../state/simulationState';
 
 const Button = styled.button`
   width: 200px;
@@ -15,7 +19,8 @@ const Button = styled.button`
 `;
 
 function Controls(): JSX.Element {
-  const [isRunning, setIsRunning] = useState(false);
+  const changeIsSimulation: Function = useAction(changeIsSimulationAction);
+  const isSimulation = useAtom(isSimulationState);
 
   const state = useAtom(appState);
   const setState: Function = useAction(changeAppState);
@@ -28,7 +33,7 @@ function Controls(): JSX.Element {
     () => {
       document.getElementById('random-button')?.click();
     },
-    isRunning && !state.isGameOver ? SIMULATION_DELAY_MS : null,
+    isSimulation && !state.isGameOver ? SIMULATION_DELAY_MS : null,
   );
 
   return (
@@ -54,10 +59,10 @@ function Controls(): JSX.Element {
       <div>
         <Button
           onClick={(): void => {
-            setIsRunning((old) => !old);
+            changeIsSimulation();
           }}
         >
-          {isRunning ? 'Stop click simulation' : 'Run click simulation'}
+          {isSimulation ? 'Stop click simulation' : 'Run click simulation'}
         </Button>
       </div>
     </div>
