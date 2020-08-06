@@ -15,58 +15,50 @@ export const getShipScheme = (shipType: ShipType): ShipScheme => {
 
   switch (model) {
     case ShipModel.LINE:
-      switch (rotation) {
-        case ShipRotation.TOP:
-        case ShipRotation.BOTTOM:
-          return (x, y): string[] => [
+      if ([ShipRotation.TOP, ShipRotation.BOTTOM].includes(rotation)) {
+        return (x, y): string[] => [
+          getKeyByCoord(x, y),
+          getKeyByCoord(x, y + 1),
+          getKeyByCoord(x, y + 2),
+          getKeyByCoord(x, y + 3),
+        ];
+      } else {
+        return (x, y): string[] => [
+          getKeyByCoord(x, y),
+          getKeyByCoord(x + 1, y),
+          getKeyByCoord(x + 2, y),
+          getKeyByCoord(x + 3, y),
+        ];
+      }
+    case ShipModel.CURVED:
+      if ([ShipRotation.TOP, ShipRotation.BOTTOM].includes(rotation)) {
+        return (x, y): string[] => {
+          const head = getKeyByCoord(
+            reverse ? x + 1 : x - 1,
+            rotation === ShipRotation.BOTTOM ? y + 2 : y,
+          );
+
+          return [
             getKeyByCoord(x, y),
             getKeyByCoord(x, y + 1),
             getKeyByCoord(x, y + 2),
-            getKeyByCoord(x, y + 3),
+            head,
           ];
-        default:
-        case ShipRotation.LEFT:
-        case ShipRotation.RIGHT:
-          return (x, y): string[] => [
+        };
+      } else {
+        return (x, y): string[] => {
+          const head = getKeyByCoord(
+            rotation === ShipRotation.LEFT ? x : x + 2,
+            reverse ? y + 1 : y - 1,
+          );
+
+          return [
             getKeyByCoord(x, y),
             getKeyByCoord(x + 1, y),
             getKeyByCoord(x + 2, y),
-            getKeyByCoord(x + 3, y),
+            head,
           ];
-      }
-    case ShipModel.CURVED:
-      switch (rotation) {
-        case ShipRotation.TOP:
-        case ShipRotation.BOTTOM:
-          return (x, y): string[] => {
-            const head = getKeyByCoord(
-              reverse ? x + 1 : x - 1,
-              rotation === ShipRotation.BOTTOM ? y + 2 : y,
-            );
-
-            return [
-              getKeyByCoord(x, y),
-              getKeyByCoord(x, y + 1),
-              getKeyByCoord(x, y + 2),
-              head,
-            ];
-          };
-        default:
-        case ShipRotation.LEFT:
-        case ShipRotation.RIGHT:
-          return (x, y): string[] => {
-            const head = getKeyByCoord(
-              rotation === ShipRotation.LEFT ? x : x + 2,
-              reverse ? y + 1 : y - 1,
-            );
-
-            return [
-              getKeyByCoord(x, y),
-              getKeyByCoord(x + 1, y),
-              getKeyByCoord(x + 2, y),
-              head,
-            ];
-          };
+        };
       }
     case ShipModel.SINGLE:
     default:
@@ -110,39 +102,36 @@ export const createShip = (shipPositions: string[], type: ShipType): Ship => {
 export const shotShip = (ship: Ship, shotKey: string): Ship => {
   const target = ship.parts[shotKey];
 
-  if (target) {
-    const newParts = { ...ship.parts };
-    let isAlive = ship.isAlive;
+  if (!target) {
+    return ship;
+  }
 
-    switch (target) {
-      case CellStatus.SHIP:
-        newParts[shotKey] = CellStatus.SHIP_SINK;
+  const newParts = { ...ship.parts };
+  let isAlive = ship.isAlive;
 
-        isAlive = Object.values(newParts).some(
-          (status) => status === CellStatus.SHIP,
-        );
+  if (target === CellStatus.SHIP_BOUNDARY) {
+    newParts[shotKey] = CellStatus.MISSED;
+  }
 
-        if (!isAlive) {
-          for (const [key, value] of Object.entries(newParts)) {
-            if (value === CellStatus.SHIP_SINK) {
-              newParts[key] = CellStatus.SHIP_DEAD;
-            }
+  if (target === CellStatus.SHIP) {
+    newParts[shotKey] = CellStatus.SHIP_SINK;
 
-            if (value === CellStatus.SHIP_BOUNDARY) {
-              newParts[key] = CellStatus.MISSED;
-            }
-          }
+    isAlive = Object.values(newParts).some(
+      (status) => status === CellStatus.SHIP,
+    );
+
+    if (!isAlive) {
+      for (const [key, value] of Object.entries(newParts)) {
+        if (value === CellStatus.SHIP_SINK) {
+          newParts[key] = CellStatus.SHIP_DEAD;
         }
 
-        break;
-      case CellStatus.SHIP_BOUNDARY:
-        newParts[shotKey] = CellStatus.MISSED;
-        break;
-      default:
-        break;
+        if (value === CellStatus.SHIP_BOUNDARY) {
+          newParts[key] = CellStatus.MISSED;
+        }
+      }
     }
-
-    return { ...ship, parts: newParts, isAlive };
   }
-  return ship;
+
+  return { ...ship, parts: newParts, isAlive };
 };
