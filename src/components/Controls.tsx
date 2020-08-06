@@ -18,8 +18,8 @@ const Button = styled.button`
   margin-top: 14px;
 `;
 
-function Controls(): JSX.Element {
-  const changeIsSimulation: Function = useAction(changeIsSimulationAction);
+const Controls = (): JSX.Element => {
+  const changeIsSimulation: () => void = useAction(changeIsSimulationAction);
   const isSimulation = useAtom(isSimulationState);
 
   const state = useAtom(appState);
@@ -57,17 +57,12 @@ function Controls(): JSX.Element {
         </Button>
       </div>
       <div>
-        <Button
-          data-testid="simulation-button"
-          onClick={(): void => {
-            changeIsSimulation();
-          }}
-        >
+        <Button data-testid="simulation-button" onClick={changeIsSimulation}>
           {isSimulation ? 'Stop click simulation' : 'Run click simulation'}
         </Button>
       </div>
     </div>
   );
-}
+};
 
 export default Controls;

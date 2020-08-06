@@ -13,7 +13,7 @@ const AppContainer = styled.div`
 
 export const store = createStore();
 
-function App(): JSX.Element {
+const App = (): JSX.Element => {
   return (
     <context.Provider value={store}>
       <AppContainer>
@@ -22,6 +22,6 @@ function App(): JSX.Element {
       </AppContainer>
     </context.Provider>
   );
-}
+};
 
 export default App;

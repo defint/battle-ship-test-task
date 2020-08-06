@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { CELL_BORDER_COLOR, CELL_SIZE } from './CellContainer';
+import { CELL_BORDER_COLOR, CELL_SIZE } from './Cell';
 import { AREA_SIZE } from '../utils/constants';
 
 export const CellsWrapper = styled.div`

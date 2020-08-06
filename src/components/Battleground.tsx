@@ -8,7 +8,7 @@ import { AREA_SIZE } from '../utils/constants';
 import { getKeyByCoord } from '../utils/battleground';
 import { store } from './App';
 
-function Battleground(): JSX.Element {
+const Battleground = (): JSX.Element => {
   const setState: Function = useAction(changeAppState);
 
   const cells: JSX.Element[] = [];
@@ -29,6 +29,6 @@ function Battleground(): JSX.Element {
   }
 
   return <CellsWrapper>{cells}</CellsWrapper>;
-}
+};
 
 export default Battleground;
