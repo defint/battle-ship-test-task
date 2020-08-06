@@ -36,7 +36,7 @@ export interface Ship {
 
 export interface AppState {
   battleground: BattlegroundState;
-  isGameOver: boolean;
+  fameOver: boolean;
   ships: Ship[];
 }
 

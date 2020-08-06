@@ -33,7 +33,7 @@ const Controls = (): JSX.Element => {
     () => {
       document.getElementById('random-button')?.click();
     },
-    isSimulation && !state.isGameOver ? SIMULATION_DELAY_MS : null,
+    isSimulation && !state.fameOver ? SIMULATION_DELAY_MS : null,
   );
 
   return (
@@ -42,9 +42,9 @@ const Controls = (): JSX.Element => {
         <Button
           id="random-button"
           onClick={clickRandomCallback}
-          disabled={state.isGameOver}
+          disabled={state.fameOver}
         >
-          {state.isGameOver ? 'Game is over' : 'Make random shot'}
+          {state.fameOver ? 'Game is over' : 'Make random shot'}
         </Button>
       </div>
       <div>

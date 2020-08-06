@@ -37,16 +37,16 @@ export const makeShot = (
     shotShip(ship, availableKey),
   );
 
-  let isGameOver = true;
+  let fameOver = true;
   recalculatedShips.forEach((ship) => {
     battleground = mergeBattlegroundState(battleground, ship.parts);
-    isGameOver = isGameOver && !ship.isAlive;
+    fameOver = fameOver && !ship.isAlive;
   });
 
   return {
     ships: recalculatedShips,
     battleground,
-    isGameOver,
+    fameOver,
   };
 };
 
