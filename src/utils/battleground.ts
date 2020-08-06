@@ -37,7 +37,7 @@ export const mergeBattlegroundState = (
 };
 
 const getInitialBattlegroundState = (): BattlegroundState => {
-  const battleground: { [key: string]: CellStatus } = {};
+  const battleground: BattlegroundState = {};
 
   for (let i = 0; i < AREA_SIZE; i++) {
     for (let j = 0; j < AREA_SIZE; j++) {
