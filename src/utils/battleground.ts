@@ -83,6 +83,12 @@ export const getInitialState = (): AppState => {
       ]),
     };
     const allPositions = checkAvailableShipPosition(battleground, type);
+
+    if (allPositions.length === 0) {
+      console.log("You don't have available cells for type:", type);
+      return;
+    }
+
     const randomPosition: string[] = getRandomArrayItem<string[]>(allPositions);
     const ship = createShip(randomPosition, type);
     ships.push(ship);
