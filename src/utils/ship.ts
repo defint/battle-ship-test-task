@@ -67,11 +67,13 @@ export const getShipScheme = (shipType: ShipType): ShipScheme => {
 };
 
 export const createShip = (shipPositions: string[], type: ShipType): Ship => {
-  const parts: BattlegroundState = {};
-
-  shipPositions.forEach((item) => {
-    parts[item] = CellStatus.SHIP;
-  });
+  const parts: BattlegroundState = shipPositions.reduce<BattlegroundState>(
+    (acc, item) => {
+      acc[item] = CellStatus.SHIP;
+      return acc;
+    },
+    {},
+  );
 
   const boundaries: BattlegroundState = {};
 

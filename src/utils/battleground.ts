@@ -91,7 +91,7 @@ export const getInitialState = (): AppState => {
 
   return {
     battleground,
-    fameOver: false,
+    gameOver: false,
     ships,
   };
 };
