@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { SIMULATION_DELAY_MS } from '../utils/constants';
 import Cell from './Cell';
-import { AppState } from '../utils/types';
 import { getInitialState } from '../utils/battleground';
 import { makeRandomShot, makeShot } from '../utils/shot';
-import { useInterval } from '../utils/useInterval';
 import { CellsWrapper } from './CellsWrapper';
 import styled from 'styled-components';
+import { useAction, useAtom } from '@reatom/react';
+import { useInterval } from '../utils/useInterval';
+import { SIMULATION_DELAY_MS } from '../utils/constants';
+import { appState, changeAppState } from '../state/appState';
 
 const AppContainer = styled.div`
   display: flex;
@@ -24,10 +25,17 @@ const Button = styled.button`
 function App(): JSX.Element {
   const [isRunning, setIsRunning] = useState(false);
 
-  const [state, setState] = useState<AppState>(getInitialState());
+  const state = useAtom(appState);
+  const setState: Function = useAction(changeAppState);
+
+  const clickRandomCallback = (): void => {
+    setState(makeRandomShot(state));
+  };
 
   useInterval(
-    () => setState(makeRandomShot),
+    () => {
+      document.getElementById('random-button')?.click();
+    },
     isRunning && !state.isGameOver ? SIMULATION_DELAY_MS : null,
   );
 
@@ -38,7 +46,7 @@ function App(): JSX.Element {
       <Cell
         key={key}
         cellState={value}
-        onClick={(): void => setState((old) => makeShot(old, key))}
+        onClick={(): void => setState(makeShot(state, key))}
       />,
     );
   }
@@ -48,9 +56,8 @@ function App(): JSX.Element {
       <div>
         <div>
           <Button
-            onClick={(): void => {
-              setState(makeRandomShot);
-            }}
+            id="random-button"
+            onClick={clickRandomCallback}
             disabled={state.isGameOver}
           >
             {state.isGameOver ? 'Game is over' : 'Make random shot'}
@@ -71,7 +78,7 @@ function App(): JSX.Element {
               setIsRunning((old) => !old);
             }}
           >
-            {isRunning ? 'Stop simulation' : 'Run simulation'}
+            {isRunning ? 'Stop click simulation' : 'Run click simulation'}
           </Button>
         </div>
       </div>
