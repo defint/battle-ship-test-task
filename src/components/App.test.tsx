@@ -2,7 +2,7 @@ import React from 'react';
 import { render, fireEvent, getNodeText } from '@testing-library/react';
 import App from './App';
 
-test('', () => {
+test('simulation should be started and stopped', () => {
   const { getByTestId } = render(<App />);
   const buttonSimulation = getByTestId('simulation-button');
 
