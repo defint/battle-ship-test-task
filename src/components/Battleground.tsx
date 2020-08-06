@@ -15,12 +15,13 @@ function Battleground(): JSX.Element {
 
   for (let i = 0; i < AREA_SIZE; i++) {
     for (let j = 0; j < AREA_SIZE; j++) {
+      const key = getKeyByCoord(i, j);
       cells.push(
         <Cell
-          key={getKeyByCoord(i, j)}
-          cellKey={getKeyByCoord(i, j)}
+          key={key}
+          cellKey={key}
           onClick={(): void =>
-            setState(makeShot(store.getState(appState), getKeyByCoord(i, j)))
+            setState(makeShot(store.getState(appState), key))
           }
         />,
       );
