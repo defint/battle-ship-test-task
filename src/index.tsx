@@ -2,16 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
-import { context } from '@reatom/react';
-import { createStore } from '@reatom/core';
-
-export const store = createStore();
 
 ReactDOM.render(
   <React.StrictMode>
-    <context.Provider value={store}>
-      <App />
-    </context.Provider>
+    <App />
   </React.StrictMode>,
   document.getElementById('root'),
 );

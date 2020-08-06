@@ -58,6 +58,7 @@ function Controls(): JSX.Element {
       </div>
       <div>
         <Button
+          data-testid="simulation-button"
           onClick={(): void => {
             changeIsSimulation();
           }}
